@@ -141,51 +141,6 @@ class MainWindow(QMainWindow):
         busena_label.setGeometry(10,130,400,30)
         
         
-        #--------------------------------------------GRAFIKAS-------------------------------#
-        
-        """global suviai
-        global itampa
-        global laikas
-        
-        suviai = []
-        itampa = []
-        laikas = []
-        
-        labelStyle = {'color':'#FFF','font-size':'18pt'}
-        global graph_suviai
-        graph_suviai=self.graphWidget = pg.PlotWidget(self)
-       
-        graph_suviai.setLabel('left',text='Šuviai (š/min)', units='',**labelStyle)
-        graph_suviai.setLabel('bottom',text='Laikas',units='min',**labelStyle)
-        graph_suviai.move(40,40)
-        graph_suviai.resize(640,460)
-        
-        
-        
-        global graph_itampa
-        graph_itampa = self.graphWidget = pg.PlotWidget(self)
-        graph_itampa.setLabel('left',text='Įtampa', units='V',**labelStyle)
-        graph_itampa.setLabel('bottom',text='Laikas',units='min',**labelStyle)
-        graph_itampa.move(700,40)
-        graph_itampa.resize(640,460)
-        
-        self.setGeometry
-        self.show()
-        data_line1 = graph_suviai.plot(laikas,
-                                suviai,
-                                pen='g', 
-                                symbol = 'o',
-                                symbolPen='g',
-                                name='green'
-                                )
-        data_line2 = graph_itampa.plot(laikas, 
-                                itampa,
-                                prm = 'r',
-                                symbol = 'o',
-                                symbolPen='r',
-                                name='red'
-                                ) """ 
-        
         #-----------------------------FUNKCIJOS------------------------------------------#
     def surinkti_duomenis(self):
         #mas = []
