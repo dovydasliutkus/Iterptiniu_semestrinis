@@ -26,6 +26,7 @@
 #include "ssd1306_tests.h"
 #include "ssd1306_conf.h"
 #include "stdio.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -88,6 +89,10 @@ char rx_data[10];
 uint8_t rx_index = 0;
 char rx_char;
 char buff[12];
+char buff1[42];
+char zaza[40];
+uint32_t suviai_tarp[100];
+int iter = 0;
 
 #ifdef __GNUC__
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
@@ -147,8 +152,38 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 void sendData()
 {
 	snprintf(buff,12,"S %d %d %0.1f %d",suvis_total,pertaisymai,itampa,time);
+	for(int i=0;i<iter;i++)
+	{
+
+		char temp[40];
+		snprintf(temp,80,"%ld ",(suviai_tarp[i]+i));
+		strcat(buff1,temp);
+
+	}
+	printf("%s E\n",buff);
+	printf("%s E\n",buff1);
+
+//	snprintf(buff1,80,"I %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld",
+//			itampa_lol[0],itampa_lol[1],itampa_lol[2],
+//			itampa_lol[3],itampa_lol[4],itampa_lol[5],itampa_lol[6],itampa_lol[7],itampa_lol[8],
+//			itampa_lol[9]);
 
 }
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+//    if (huart->Instance == USART2) {
+//
+//            //rx_char = huart->Instance->DR;
+//            if(rx_char=='A')
+//            {
+//            	sendData();
+//            	printf("%s E\n",buff);
+//            	suvis_total = 0;
+//            	time = 0;
+//            	pertaisymai = 0;
+//            }
+//    }
+//    HAL_UART_Receive_IT(&huart2, (uint8_t*)&rx_char, 1); // Start next reception
+//}
 /* USER CODE END 0 */
 
 /**
@@ -190,47 +225,53 @@ int main(void)
   update_suvis();
   update_itampa();
   HAL_TIM_Base_Start_IT(&htim7);
-
+  //HAL_UART_Receive_IT(&huart2, (uint8_t*)&rx_char, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(HAL_UART_Receive(&huart2, (uint8_t*)&rx_char, 1, HAL_MAX_DELAY) == HAL_OK)
-	  {
 
-		  if (rx_char == 'A')
-		  {
-
-			  sendData();
-			  printf("%s E\n",buff);
-			  HAL_UART_Receive(&huart2, (uint8_t*)&rx_char, 1, HAL_MAX_DELAY);
-			  suvis_total = 0;
-			  time = 0;
-			  pertaisymai = 0;
-
-		  }
-
-	  }
 	  if(measureVoltage){
 		  float koef = 3.3/4095;
 		  float dal_it = 0.0;
-		  float R1 = 180;
-		  float R2 = 120;
+		  float R1 = 178;
+		  float R2 = 115;
 		  measureVoltage = 0;
 		  HAL_ADC_Start(&hadc);
 	      HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
 	      adcValue = HAL_ADC_GetValue(&hadc);
 
+	      suviai_tarp[iter] = suvis_total;
 	      dal_it = adcValue*koef;
 	      itampa = dal_it*(R1+R2)/R2;
 	      update_itampa();
+	      iter +=1;
 	  }
 	  if(status == DATA_READY || status == DATA_RESET){
 		  update_suvis();
 		  status = DATA_WAIT;
 	  }
+
+	  if(HAL_UART_Receive_IT(&huart2, (uint8_t*)&rx_char,1)==HAL_OK)
+	  	  {
+	  		  if (rx_char == 'A')
+	  		  {
+
+	  			  sendData();
+	  			  //HAL_UART_Receive_IT(&huart2, (uint8_t*)&rx_char, 1);
+	  			  suvis_total = 0;
+	  			  time = 0;
+	  			  pertaisymai = 0;
+	  			  iter = 0;
+	  			  memset(buff,0,sizeof(buff));
+	  			  memset(buff,0,sizeof(buff1));
+	  			  memset(suviai_tarp,0,sizeof(suviai_tarp));
+
+	  		  }
+
+	  	  }
 
     /* USER CODE END WHILE */
 
@@ -331,7 +372,7 @@ static void MX_ADC_Init(void)
 
   /** Configure for the selected ADC regular channel to be converted.
   */
-  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
   if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
   {
